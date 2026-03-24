@@ -1,2 +1,2 @@
-# cha-panela2
+# cha-panela
 cha
