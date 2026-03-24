@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Chá de Panela - Agatha & Leonardo 💍</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg, #ffe6f0, #ffffff);
+  margin: 0;
+  text-align: center;
+}
+
+header {
+  background: #d63384;
+  color: white;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.categoria {
+  margin-top: 30px;
+}
+
+.item {
+  background: white;
+  margin: 8px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+button {
+  background: #d63384;
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.admin {
+  margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Chá de Panela 💍</h1>
+  <p><b>Agatha & Leonardo</b></p>
+  <p>📅 11/07 às 13h</p>
+</header>
+
+<div class="container" id="lista"></div>
+
+<div class="admin">
+  <button onclick="admin()">Painel (Admin)</button>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDTQvaATARiJGntbLPd2nFQcDcYf1b4XNA",
+  authDomain: "cha-agatha-leonardo.firebaseapp.com",
+  databaseURL: "https://cha-agatha-leonardo-default-rtdb.firebaseio.com",
+  projectId: "cha-agatha-leonardo",
+  storageBucket: "cha-agatha-leonardo.firebasestorage.app",
+  messagingSenderId: "214274879866",
+  appId: "1:214274879866:web:52a2d5b5b0ba444b4426c3"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// LISTA COMPLETA
+const lista = {
+"Cozinha":[
+"Air Fryer","Processador de frutas","Batedeira","Chaleira elétrica","Sanduicheira",
+"Triturador de alho automático","Liquidificador","Tabuleiros de bolo","Potes para mantimentos",
+"Tábua de corte (Madeira)","Jogo de panelas","Panela de pressão (G)","Jogo de talheres",
+"Jogo de copos","Jogo de taças","Jogo de xícaras","Jogo de louça","Jogo de facas",
+"Descanso de panela","Pano de prato","Aventais","Jogo americano","Toalhas de mesa",
+"Escorredor de massa","Forma de gelo","Lixeira inox","Copo medidor","Ralador","Escumadeira",
+"Concha terrina","Cortador de pizza","Colher de feijão","Socador","Colher de pau",
+"Abridor","Espátula","Pegador","Fuet","Formas de vidro","Tigela","Prato de bolo",
+"Saleiro","Açucareiro","Colher de sorvete","Rolo de massa","Ramekins","Canecas",
+"Jarra de suco","Tábua de queijos","Escorredor de louça","Kit de pia","Tapetes",
+"Fruteira","Frigideira","Bule de café","Cafeteira","Chaleira","Coador de café",
+"Peneira","Petisqueira","Pincel culinário","Pirex","Jogo de sobremesa","Porta copo",
+"Porta temperos","Potes plásticos","Puxa-saco","Queijeira","Escorredor de arroz",
+"Forma pizza","Forma bolo","Forma pudim","Funil","Jogo mesa posta","Luva térmica",
+"Martelo de carne","Saca-rolha"
+],
+"Sala":[
+"Cortina","Mantas e almofadas","Quadros decorativos","Tapete","Puff","Ventilador","Capa de almofada"
+],
+"Quarto":[
+"Mesa de cabeceira","Jogo de lençol","Jogo de edredom","Cobertor","Travesseiro",
+"Kit cabide","Abajur","Cortina","Almofada","Jogo de tapetes"
+],
+"Área de Serviço":[
+"Vassoura e pá","Mop","Porta sabão","Pano de chão","Rodo","Balde","Varal",
+"Ferro de passar","Pregador","Escovão","Cesto roupa","Tábua de passar"
+],
+"Banheiro":[
+"Lixeira","Jogo de tapete","Toalha de banho","Toalha de rosto","Porta escova",
+"Porta shampoo","Kit banheiro","Escova de privada"
+]
+};
+
+function pegar(cat,item){
+  let nome = prompt("Digite seu nome:");
+  if(!nome) return;
+  db.ref("itens/"+cat+"/"+item).set(nome);
+}
+
+function render(){
+  db.ref("itens").on("value", snap=>{
+    let dados = snap.val() || {};
+    let html = "";
+
+    for(let cat in lista){
+      html += `<div class="categoria"><h2>${cat}</h2></div>`;
+
+      lista[cat].forEach(item=>{
+        let pessoa = dados?.[cat]?.[item];
+
+        html += `
+          <div class="item">
+            <b>${item}</b><br>
+            ${
+              pessoa
+              ? `<span style="color:green">${pessoa} vai levar ✅</span>`
+              : `<button onclick="pegar('${cat}','${item}')">Vou levar</button>`
+            }
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById("lista").innerHTML = html;
+  });
+}
+
+function admin(){
+  let senha = prompt("Senha:");
+  if(senha !== "1234") return alert("Senha incorreta");
+
+  let item = prompt("Nome do item para liberar novamente:");
+  let cat = prompt("Categoria:");
+
+  if(item && cat){
+    db.ref("itens/"+cat+"/"+item).remove();
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>
